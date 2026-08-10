@@ -311,10 +311,12 @@ export default function FinancePage() {
             <tbody>
               {vetData.map((vet: any) => {
                 const gross      = Number(vet.grossEarnings  ?? 0);
-                const net        = Number(vet.netEarnings    ?? 0);
                 const pfee       = Number(vet.platformFee    ?? 0);
                 const grossMonth = Number(vet.grossThisMonth ?? 0);
+                const salary     = Number(vet.monthlySalary  ?? 90000);
+                const commission = Number(vet.commission     ?? 0); // уже целое число: 50-70
                 const vProfit    = pfee * 0.60;
+                const platformPct = gross > 0 ? (100 - commission) : 0;
                 return (
                   <tr key={vet.vetId} className="border-b border-[rgba(74,222,128,0.03)] hover:bg-[rgba(74,222,128,0.025)] transition-colors">
                     <td className="px-4 py-3">
@@ -328,14 +330,14 @@ export default function FinancePage() {
                     </td>
                     <td className="px-4 py-3 text-center">
                       <span className="font-mono text-xs bg-[rgba(10,26,10,0.8)] border border-[rgba(74,222,128,0.15)] px-2 py-0.5 rounded-full">
-                        {Number(vet.commission ?? 0) * 100}%
+                        {commission}%
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right font-mono text-sm text-white/50">{formatCurrency(gross)}</td>
                     <td className="px-4 py-3 text-right font-mono text-sm text-white/70">{formatCurrency(grossMonth)}</td>
                     <td className="px-4 py-3 text-right">
-                      <div className="font-mono text-sm text-blue-400 font-semibold">{formatCurrency(net)}</div>
-                      <div className="text-[10px] text-white/25 mt-0.5">{Number(vet.commission ?? 0) * 100}% от оборота</div>
+                      <div className="font-mono text-sm text-blue-400 font-semibold">{formatCurrency(salary)}</div>
+                      <div className="text-[10px] text-white/25 mt-0.5">фиксированная ставка</div>
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="font-mono text-sm text-emerald-300 font-semibold">{formatCurrency(vProfit)}</div>
@@ -344,7 +346,7 @@ export default function FinancePage() {
                     <td className="px-4 py-3 text-right">
                       <div className="font-mono text-sm text-green-400 font-bold">{formatCurrency(pfee)}</div>
                       <div className="text-[10px] text-white/25 mt-0.5">
-                        {gross > 0 ? (100 - Number(vet.commission ?? 0) * 100).toFixed(0) : 0}% от оборота
+                        {platformPct.toFixed(0)}% от оборота
                       </div>
                     </td>
                   </tr>
@@ -361,7 +363,7 @@ export default function FinancePage() {
                   {formatCurrency(vetData.reduce((a:number,v:any)=>a+Number(v.grossThisMonth??0),0))}
                 </td>
                 <td className="px-4 py-4 text-right font-mono text-sm text-blue-400 font-bold">
-                  {formatCurrency(vetData.reduce((a:number,v:any)=>a+Number(v.netEarnings??0),0))}
+                  {formatCurrency(vetData.reduce((a:number,v:any)=>a+Number(v.monthlySalary??90000),0))}
                 </td>
                 <td className="px-4 py-4 text-right font-mono text-sm text-emerald-300 font-bold">
                   {formatCurrency(vetData.reduce((a:number,v:any)=>a+Number(v.platformFee??0)*0.60,0))}

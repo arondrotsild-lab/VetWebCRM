@@ -101,6 +101,7 @@ router.get("/finance/by-vet", async (_req, res): Promise<void> => {
   try {
     const rows = await query(`
       SELECT v.id as "vetId", u.name as "vetName", v.total_completed_orders as "completedOrders",
+        v.monthly_salary::float AS "monthlySalary",
         COALESCE(SUM(CASE WHEN o.status='completed' THEN o.total_price::numeric ELSE 0 END),0)::float AS "grossEarnings",
         COALESCE(SUM(CASE WHEN o.status='completed'
           AND DATE_TRUNC('month',o.created_at)=DATE_TRUNC('month',NOW())
@@ -109,7 +110,7 @@ router.get("/finance/by-vet", async (_req, res): Promise<void> => {
       FROM vets v
       JOIN users u ON v.user_id = u.id
       LEFT JOIN orders o ON o.vet_id = v.id
-      GROUP BY v.id, u.name, v.total_completed_orders
+      GROUP BY v.id, u.name, v.total_completed_orders, v.monthly_salary
       ORDER BY "grossEarnings" DESC
     `);
     res.json(rows.map(r => {
@@ -124,6 +125,7 @@ router.get("/finance/by-vet", async (_req, res): Promise<void> => {
         ordersCompleted: Number(r.ordersCompleted ?? 0),
         grossEarnings:   gross,
         grossThisMonth:  Number(r.grossThisMonth ?? 0),
+        monthlySalary:   Number(r.monthlySalary  ?? 90000),
         netEarnings:     net,
         platformFee:     gross - net,
       };
