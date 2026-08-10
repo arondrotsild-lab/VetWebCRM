@@ -12,7 +12,7 @@ export default function PetsPage() {
     species: speciesFilter || undefined
   });
 
-  const pets = petsList?.data || [];
+  const pets = Array.isArray(petsList) ? petsList : [];
   
   // Extract unique species for filter
   const speciesOptions = ["Собака", "Кошка", "Грызун", "Птица", "Экзотика"];

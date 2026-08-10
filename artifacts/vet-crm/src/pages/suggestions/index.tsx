@@ -11,7 +11,7 @@ export default function SuggestionsPage() {
   const { data: suggestionsList, isLoading } = useListSuggestions();
   const updateStatus = useUpdateSuggestionStatus();
 
-  const suggestions = suggestionsList?.data || [];
+  const suggestions = Array.isArray(suggestionsList) ? suggestionsList : [];
   const filtered = filter ? suggestions.filter(s => s.status === filter) : suggestions;
 
   const handleUpdateStatus = (id: number, status: string) => {

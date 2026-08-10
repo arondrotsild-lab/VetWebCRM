@@ -11,7 +11,7 @@ export default function ClientsPage() {
     search: search || undefined
   });
 
-  const clients = clientsList?.data || [];
+  const clients = Array.isArray(clientsList) ? clientsList : [];
 
   return (
     <div className="space-y-6 animate-fade-in">

@@ -16,7 +16,7 @@ export default function VetsPage() {
     isVerified: verifiedFilter
   });
 
-  const vets = vetsList?.data || [];
+  const vets = Array.isArray(vetsList) ? vetsList : [];
   const tiers = [
     { value: "", label: "Все уровни" },
     { value: "Бронза", label: "Бронза" },

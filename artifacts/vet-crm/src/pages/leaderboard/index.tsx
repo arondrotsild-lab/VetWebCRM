@@ -14,7 +14,7 @@ export default function LeaderboardPage() {
     );
   }
 
-  const entries = leaderboardData?.data || [];
+  const entries = Array.isArray(leaderboardData) ? leaderboardData : [];
 
   const getRankStyle = (rank: number) => {
     switch(rank) {

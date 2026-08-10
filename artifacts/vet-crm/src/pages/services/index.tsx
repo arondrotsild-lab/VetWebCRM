@@ -4,7 +4,7 @@ import { Loader2, Plus, Edit2, ActivitySquare, CheckCircle2, XCircle, Clock } fr
 
 export default function ServicesPage() {
   const { data: servicesList, isLoading } = useListServices();
-  const services = servicesList?.data || [];
+  const services = Array.isArray(servicesList) ? servicesList : [];
 
   return (
     <div className="space-y-6 animate-fade-in">
