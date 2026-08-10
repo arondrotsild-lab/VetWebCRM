@@ -29,7 +29,28 @@ router.get("/finance/summary", async (_req, res): Promise<void> => {
     const lastMonth = Number(r.last_month ?? 0);
     const growth = lastMonth > 0 ? ((thisMonth - lastMonth) / lastMonth) * 100 : 0;
     const platformRevenue = total * 0.42;
-    res.json({ totalRevenue: total, platformRevenue, vetEarnings: total - platformRevenue, avgOrderValue: Number(r.avg_order ?? 0), completedOrdersCount: Number(r.completed_count ?? 0), revenueThisMonth: thisMonth, revenueLastMonth: lastMonth, growthPercent: Number(growth.toFixed(1)) });
+    const vetEarnings = total - platformRevenue;
+    // Чистая прибыль = выручка платформы минус операционные расходы (18% от оборота)
+    const operationalCosts = total * 0.18;
+    const netProfit = platformRevenue - operationalCosts;
+    const netProfitThisMonth = thisMonth * 0.42 - thisMonth * 0.18;
+    const netProfitLastMonth = lastMonth * 0.42 - lastMonth * 0.18;
+    const netProfitGrowth = netProfitLastMonth > 0 ? ((netProfitThisMonth - netProfitLastMonth) / netProfitLastMonth) * 100 : 0;
+    res.json({
+      totalRevenue: total,
+      platformRevenue,
+      vetEarnings,
+      netProfit,
+      operationalCosts,
+      netProfitThisMonth,
+      netProfitLastMonth,
+      netProfitGrowth: Number(netProfitGrowth.toFixed(1)),
+      avgOrderValue: Number(r.avg_order ?? 0),
+      completedOrdersCount: Number(r.completed_count ?? 0),
+      revenueThisMonth: thisMonth,
+      revenueLastMonth: lastMonth,
+      growthPercent: Number(growth.toFixed(1))
+    });
   } catch (err) {
     logger.error({ err }, "GET /finance/summary error");
     res.status(500).json({ error: "Internal error" });
