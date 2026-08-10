@@ -3,20 +3,38 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: VetCRM Admin API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: dashboard
+    description: Dashboard statistics
+  - name: orders
+    description: Order management
+  - name: vets
+    description: Veterinarian management
+  - name: clients
+    description: Client management
+  - name: pets
+    description: Pet management
+  - name: services
+    description: Service catalog
+  - name: finance
+    description: Financial data
+  - name: leaderboard
+    description: Vet leaderboard
+  - name: suggestions
+    description: Service suggestions
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +42,1299 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ── DASHBOARD ──────────────────────────────────────────────────────
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Main dashboard KPIs
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /dashboard/orders-by-status:
+    get:
+      operationId: getDashboardOrdersByStatus
+      tags: [dashboard]
+      summary: Orders grouped by status
+      responses:
+        "200":
+          description: Orders by status
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StatusCount"
+
+  /dashboard/revenue-chart:
+    get:
+      operationId: getDashboardRevenueChart
+      tags: [dashboard]
+      summary: Daily revenue for the last 30 days
+      responses:
+        "200":
+          description: Revenue chart data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RevenueChartPoint"
+
+  /dashboard/recent-orders:
+    get:
+      operationId: getDashboardRecentOrders
+      tags: [dashboard]
+      summary: Last 10 orders
+      responses:
+        "200":
+          description: Recent orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+
+  /dashboard/top-vets:
+    get:
+      operationId: getDashboardTopVets
+      tags: [dashboard]
+      summary: Top 5 vets by completed orders
+      responses:
+        "200":
+          description: Top vets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VetSummary"
+
+  # ── ORDERS ─────────────────────────────────────────────────────────
+  /orders:
+    get:
+      operationId: listOrders
+      tags: [orders]
+      summary: List all orders
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: vetId
+          in: query
+          schema:
+            type: ["number", "null"]
+        - name: page
+          in: query
+          schema:
+            type: number
+        - name: limit
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderList"
+    post:
+      operationId: createOrder
+      tags: [orders]
+      summary: Create a new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderInput"
+      responses:
+        "201":
+          description: Created order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      tags: [orders]
+      summary: Get order by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateOrder
+      tags: [orders]
+      summary: Update order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderUpdate"
+      responses:
+        "200":
+          description: Updated order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+    delete:
+      operationId: deleteOrder
+      tags: [orders]
+      summary: Delete order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          description: Deleted
+
+  /orders/{id}/status:
+    patch:
+      operationId: updateOrderStatus
+      tags: [orders]
+      summary: Update order status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderStatusUpdate"
+      responses:
+        "200":
+          description: Updated order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+  /orders/{id}/assign:
+    patch:
+      operationId: assignOrderVet
+      tags: [orders]
+      summary: Assign vet to order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderAssign"
+      responses:
+        "200":
+          description: Updated order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+  # ── VETS ───────────────────────────────────────────────────────────
+  /vets:
+    get:
+      operationId: listVets
+      tags: [vets]
+      summary: List all vets
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: tier
+          in: query
+          schema:
+            type: string
+        - name: isVerified
+          in: query
+          schema:
+            type: boolean
+        - name: isAvailable
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of vets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Vet"
+    post:
+      operationId: createVet
+      tags: [vets]
+      summary: Create vet profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VetInput"
+      responses:
+        "201":
+          description: Created vet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vet"
+
+  /vets/{id}:
+    get:
+      operationId: getVet
+      tags: [vets]
+      summary: Get vet by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Vet profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vet"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateVet
+      tags: [vets]
+      summary: Update vet profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VetUpdate"
+      responses:
+        "200":
+          description: Updated vet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vet"
+    delete:
+      operationId: deleteVet
+      tags: [vets]
+      summary: Delete vet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          description: Deleted
+
+  /vets/{id}/orders:
+    get:
+      operationId: getVetOrders
+      tags: [vets]
+      summary: Get orders for a vet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Vet orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+
+  /vets/{id}/verify:
+    patch:
+      operationId: verifyVet
+      tags: [vets]
+      summary: Toggle vet verification
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VetVerify"
+      responses:
+        "200":
+          description: Updated vet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vet"
+
+  # ── CLIENTS ────────────────────────────────────────────────────────
+  /clients:
+    get:
+      operationId: listClients
+      tags: [clients]
+      summary: List all clients
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Client"
+    post:
+      operationId: createClient
+      tags: [clients]
+      summary: Create client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientInput"
+      responses:
+        "201":
+          description: Created client
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
+
+  /clients/{id}:
+    get:
+      operationId: getClient
+      tags: [clients]
+      summary: Get client by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Client
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateClient
+      tags: [clients]
+      summary: Update client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientUpdate"
+      responses:
+        "200":
+          description: Updated client
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
+    delete:
+      operationId: deleteClient
+      tags: [clients]
+      summary: Delete client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          description: Deleted
+
+  /clients/{id}/orders:
+    get:
+      operationId: getClientOrders
+      tags: [clients]
+      summary: Get orders for a client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Client orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+
+  /clients/{id}/pets:
+    get:
+      operationId: getClientPets
+      tags: [clients]
+      summary: Get pets for a client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Client pets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pet"
+
+  # ── PETS ───────────────────────────────────────────────────────────
+  /pets:
+    get:
+      operationId: listPets
+      tags: [pets]
+      summary: List all pets
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: species
+          in: query
+          schema:
+            type: string
+        - name: clientId
+          in: query
+          schema:
+            type: ["number", "null"]
+      responses:
+        "200":
+          description: List of pets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pet"
+    post:
+      operationId: createPet
+      tags: [pets]
+      summary: Create pet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PetInput"
+      responses:
+        "201":
+          description: Created pet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+
+  /pets/{id}:
+    get:
+      operationId: getPet
+      tags: [pets]
+      summary: Get pet by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Pet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+        "404":
+          description: Not found
+    patch:
+      operationId: updatePet
+      tags: [pets]
+      summary: Update pet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PetUpdate"
+      responses:
+        "200":
+          description: Updated pet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pet"
+    delete:
+      operationId: deletePet
+      tags: [pets]
+      summary: Delete pet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          description: Deleted
+
+  /pets/{id}/medical-records:
+    get:
+      operationId: getPetMedicalRecords
+      tags: [pets]
+      summary: Get medical records for a pet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Medical records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MedicalRecord"
+    post:
+      operationId: createMedicalRecord
+      tags: [pets]
+      summary: Create medical record
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MedicalRecordInput"
+      responses:
+        "201":
+          description: Created record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MedicalRecord"
+
+  # ── SERVICES ───────────────────────────────────────────────────────
+  /services:
+    get:
+      operationId: listServices
+      tags: [services]
+      summary: List all services
+      responses:
+        "200":
+          description: List of services
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+    post:
+      operationId: createService
+      tags: [services]
+      summary: Create service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceInput"
+      responses:
+        "201":
+          description: Created service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+
+  /services/{id}:
+    get:
+      operationId: getService
+      tags: [services]
+      summary: Get service by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+    patch:
+      operationId: updateService
+      tags: [services]
+      summary: Update service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceUpdate"
+      responses:
+        "200":
+          description: Updated service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+    delete:
+      operationId: deleteService
+      tags: [services]
+      summary: Delete service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          description: Deleted
+
+  # ── FINANCE ────────────────────────────────────────────────────────
+  /finance/summary:
+    get:
+      operationId: getFinanceSummary
+      tags: [finance]
+      summary: Financial summary
+      responses:
+        "200":
+          description: Finance summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FinanceSummary"
+
+  /finance/by-vet:
+    get:
+      operationId: getFinanceByVet
+      tags: [finance]
+      summary: Revenue and commission per vet
+      responses:
+        "200":
+          description: Finance by vet
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VetFinance"
+
+  /finance/by-service:
+    get:
+      operationId: getFinanceByService
+      tags: [finance]
+      summary: Revenue grouped by service
+      responses:
+        "200":
+          description: Finance by service
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServiceFinance"
+
+  # ── LEADERBOARD ────────────────────────────────────────────────────
+  /leaderboard:
+    get:
+      operationId: getLeaderboard
+      tags: [leaderboard]
+      summary: Vet leaderboard ranked by completed orders
+      responses:
+        "200":
+          description: Leaderboard
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LeaderboardEntry"
+
+  # ── SUGGESTIONS ────────────────────────────────────────────────────
+  /suggestions:
+    get:
+      operationId: listSuggestions
+      tags: [suggestions]
+      summary: List service suggestions from clients
+      responses:
+        "200":
+          description: Suggestions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Suggestion"
+
+  /suggestions/{id}/status:
+    patch:
+      operationId: updateSuggestionStatus
+      tags: [suggestions]
+      summary: Update suggestion status (reviewed/approved/rejected)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SuggestionStatusUpdate"
+      responses:
+        "200":
+          description: Updated suggestion
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Suggestion"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    # ── DASHBOARD ──────────────────────────────────────────────────
+    DashboardStats:
+      type: object
+      required:
+        - totalOrders
+        - activeOrders
+        - completedOrders
+        - cancelledOrders
+        - totalRevenue
+        - platformRevenue
+        - totalVets
+        - activeVets
+        - verifiedVets
+        - totalClients
+        - totalPets
+        - avgRating
+        - ordersToday
+        - revenueToday
+      properties:
+        totalOrders:      { type: number }
+        activeOrders:     { type: number }
+        completedOrders:  { type: number }
+        cancelledOrders:  { type: number }
+        totalRevenue:     { type: number }
+        platformRevenue:  { type: number }
+        totalVets:        { type: number }
+        activeVets:       { type: number }
+        verifiedVets:     { type: number }
+        totalClients:     { type: number }
+        totalPets:        { type: number }
+        avgRating:        { type: number }
+        ordersToday:      { type: number }
+        revenueToday:     { type: number }
+
+    StatusCount:
+      type: object
+      required: [status, count]
+      properties:
+        status: { type: string }
+        count:  { type: number }
+
+    RevenueChartPoint:
+      type: object
+      required: [date, revenue, orders]
+      properties:
+        date:    { type: string }
+        revenue: { type: number }
+        orders:  { type: number }
+
+    VetSummary:
+      type: object
+      required: [id, name, completedOrders, rating, tier]
+      properties:
+        id:              { type: number }
+        name:            { type: string }
+        completedOrders: { type: number }
+        rating:          { type: string }
+        tier:            { type: string }
+        photoUrl:        { type: ["string", "null"] }
+
+    # ── ORDER ──────────────────────────────────────────────────────
+    Order:
+      type: object
+      required:
+        - id
+        - clientId
+        - serviceId
+        - address
+        - status
+        - totalPrice
+        - createdAt
+        - updatedAt
+      properties:
+        id:          { type: number }
+        clientId:    { type: number }
+        vetId:       { type: ["number", "null"] }
+        petId:       { type: ["number", "null"] }
+        serviceId:   { type: number }
+        address:     { type: string }
+        scheduledAt: { type: ["string", "null"] }
+        status:      { type: string }
+        notes:       { type: ["string", "null"] }
+        totalPrice:  { type: number }
+        createdAt:   { type: string }
+        updatedAt:   { type: string }
+        # Joined fields
+        clientName:   { type: ["string", "null"] }
+        clientPhone:  { type: ["string", "null"] }
+        vetName:      { type: ["string", "null"] }
+        petName:      { type: ["string", "null"] }
+        petSpecies:   { type: ["string", "null"] }
+        petBreed:     { type: ["string", "null"] }
+        serviceName:  { type: ["string", "null"] }
+        serviceIcon:  { type: ["string", "null"] }
+        priceFrom:    { type: ["number", "null"] }
+        priceTo:      { type: ["number", "null"] }
+
+    OrderList:
+      type: object
+      required: [orders, total]
+      properties:
+        orders:
+          type: array
+          items:
+            $ref: "#/components/schemas/Order"
+        total: { type: number }
+
+    OrderInput:
+      type: object
+      required: [clientId, serviceId, address, totalPrice]
+      properties:
+        clientId:    { type: number }
+        vetId:       { type: ["number", "null"] }
+        petId:       { type: ["number", "null"] }
+        serviceId:   { type: number }
+        address:     { type: string }
+        scheduledAt: { type: string }
+        notes:       { type: string }
+        totalPrice:  { type: number }
+
+    OrderUpdate:
+      type: object
+      properties:
+        vetId:       { type: ["number", "null"] }
+        petId:       { type: ["number", "null"] }
+        address:     { type: string }
+        scheduledAt: { type: string }
+        notes:       { type: string }
+        totalPrice:  { type: number }
+
+    OrderStatusUpdate:
+      type: object
+      required: [status]
+      properties:
+        status:  { type: string }
+        comment: { type: string }
+
+    OrderAssign:
+      type: object
+      required: [vetId]
+      properties:
+        vetId: { type: number }
+
+    # ── VET ────────────────────────────────────────────────────────
+    Vet:
+      type: object
+      required:
+        - id
+        - name
+        - phone
+        - specialization
+        - experienceYears
+        - rating
+        - reviewsCount
+        - isAvailable
+        - isVerified
+        - totalCompletedOrders
+        - totalEarnings
+        - tier
+        - commission
+        - createdAt
+      properties:
+        id:                    { type: number }
+        name:                  { type: string }
+        phone:                 { type: string }
+        email:                 { type: ["string", "null"] }
+        specialization:        { type: string }
+        experienceYears:       { type: number }
+        rating:                { type: string }
+        reviewsCount:          { type: number }
+        bio:                   { type: ["string", "null"] }
+        photoUrl:              { type: ["string", "null"] }
+        isAvailable:           { type: boolean }
+        isVerified:            { type: boolean }
+        totalCompletedOrders:  { type: number }
+        totalEarnings:         { type: number }
+        tier:                  { type: string }
+        commission:            { type: number }
+        createdAt:             { type: string }
+
+    VetInput:
+      type: object
+      required: [name, phone, specialization, experienceYears]
+      properties:
+        name:             { type: string }
+        phone:            { type: string }
+        email:            { type: string }
+        specialization:   { type: string }
+        experienceYears:  { type: number }
+        bio:              { type: string }
+        photoUrl:         { type: string }
+        isAvailable:      { type: boolean }
+        isVerified:       { type: boolean }
+
+    VetUpdate:
+      type: object
+      properties:
+        name:             { type: string }
+        phone:            { type: string }
+        email:            { type: string }
+        specialization:   { type: string }
+        experienceYears:  { type: number }
+        bio:              { type: string }
+        photoUrl:         { type: string }
+        isAvailable:      { type: boolean }
+        isVerified:       { type: boolean }
+
+    VetVerify:
+      type: object
+      required: [isVerified]
+      properties:
+        isVerified: { type: boolean }
+
+    # ── CLIENT ─────────────────────────────────────────────────────
+    Client:
+      type: object
+      required: [id, name, phone, ordersCount, createdAt]
+      properties:
+        id:          { type: number }
+        name:        { type: string }
+        phone:       { type: string }
+        email:       { type: ["string", "null"] }
+        ordersCount: { type: number }
+        totalSpent:  { type: number }
+        createdAt:   { type: string }
+
+    ClientInput:
+      type: object
+      required: [name, phone]
+      properties:
+        name:  { type: string }
+        phone: { type: string }
+        email: { type: string }
+
+    ClientUpdate:
+      type: object
+      properties:
+        name:  { type: string }
+        phone: { type: string }
+        email: { type: string }
+
+    # ── PET ────────────────────────────────────────────────────────
+    Pet:
+      type: object
+      required: [id, name, species, clientId, createdAt]
+      properties:
+        id:           { type: number }
+        name:         { type: string }
+        species:      { type: string }
+        breed:        { type: ["string", "null"] }
+        age:          { type: ["number", "null"] }
+        weight:       { type: ["number", "null"] }
+        color:        { type: ["string", "null"] }
+        notes:        { type: ["string", "null"] }
+        clientId:     { type: number }
+        clientName:   { type: ["string", "null"] }
+        createdAt:    { type: string }
+
+    PetInput:
+      type: object
+      required: [name, species, clientId]
+      properties:
+        name:      { type: string }
+        species:   { type: string }
+        breed:     { type: string }
+        age:       { type: number }
+        weight:    { type: number }
+        color:     { type: string }
+        notes:     { type: string }
+        clientId:  { type: number }
+
+    PetUpdate:
+      type: object
+      properties:
+        name:    { type: string }
+        species: { type: string }
+        breed:   { type: string }
+        age:     { type: number }
+        weight:  { type: number }
+        color:   { type: string }
+        notes:   { type: string }
+
+    MedicalRecord:
+      type: object
+      required: [id, petId, diagnosis, createdAt]
+      properties:
+        id:          { type: number }
+        petId:       { type: number }
+        orderId:     { type: ["number", "null"] }
+        vetId:       { type: ["number", "null"] }
+        vetName:     { type: ["string", "null"] }
+        diagnosis:   { type: string }
+        treatment:   { type: ["string", "null"] }
+        prescription: { type: ["string", "null"] }
+        nextVisit:    { type: ["string", "null"] }
+        notes:        { type: ["string", "null"] }
+        createdAt:    { type: string }
+
+    MedicalRecordInput:
+      type: object
+      required: [diagnosis]
+      properties:
+        orderId:      { type: number }
+        vetId:        { type: number }
+        diagnosis:    { type: string }
+        treatment:    { type: string }
+        prescription: { type: string }
+        nextVisit:    { type: string }
+        notes:        { type: string }
+
+    # ── SERVICE ────────────────────────────────────────────────────
+    Service:
+      type: object
+      required: [id, name, priceFrom, priceTo, isActive]
+      properties:
+        id:          { type: number }
+        name:        { type: string }
+        icon:        { type: ["string", "null"] }
+        description: { type: ["string", "null"] }
+        priceFrom:   { type: number }
+        priceTo:     { type: number }
+        duration:    { type: ["number", "null"] }
+        isActive:    { type: boolean }
+        ordersCount: { type: number }
+
+    ServiceInput:
+      type: object
+      required: [name, priceFrom, priceTo]
+      properties:
+        name:        { type: string }
+        icon:        { type: string }
+        description: { type: string }
+        priceFrom:   { type: number }
+        priceTo:     { type: number }
+        duration:    { type: number }
+        isActive:    { type: boolean }
+
+    ServiceUpdate:
+      type: object
+      properties:
+        name:        { type: string }
+        icon:        { type: string }
+        description: { type: string }
+        priceFrom:   { type: number }
+        priceTo:     { type: number }
+        duration:    { type: number }
+        isActive:    { type: boolean }
+
+    # ── FINANCE ────────────────────────────────────────────────────
+    FinanceSummary:
+      type: object
+      required:
+        - totalRevenue
+        - platformRevenue
+        - vetEarnings
+        - avgOrderValue
+        - completedOrdersCount
+        - revenueThisMonth
+        - revenueLastMonth
+        - growthPercent
+      properties:
+        totalRevenue:         { type: number }
+        platformRevenue:      { type: number }
+        vetEarnings:          { type: number }
+        avgOrderValue:        { type: number }
+        completedOrdersCount: { type: number }
+        revenueThisMonth:     { type: number }
+        revenueLastMonth:     { type: number }
+        growthPercent:        { type: number }
+
+    VetFinance:
+      type: object
+      required: [vetId, vetName, tier, commission, completedOrders, grossEarnings, netEarnings, platformFee]
+      properties:
+        vetId:            { type: number }
+        vetName:          { type: string }
+        tier:             { type: string }
+        commission:       { type: number }
+        completedOrders:  { type: number }
+        grossEarnings:    { type: number }
+        netEarnings:      { type: number }
+        platformFee:      { type: number }
+
+    ServiceFinance:
+      type: object
+      required: [serviceId, serviceName, ordersCount, totalRevenue, avgPrice]
+      properties:
+        serviceId:    { type: number }
+        serviceName:  { type: string }
+        serviceIcon:  { type: ["string", "null"] }
+        ordersCount:  { type: number }
+        totalRevenue: { type: number }
+        avgPrice:     { type: number }
+
+    # ── LEADERBOARD ────────────────────────────────────────────────
+    LeaderboardEntry:
+      type: object
+      required: [rank, vetId, name, tier, completedOrders, rating, reviewsCount]
+      properties:
+        rank:             { type: number }
+        vetId:            { type: number }
+        name:             { type: string }
+        tier:             { type: string }
+        completedOrders:  { type: number }
+        rating:           { type: string }
+        reviewsCount:     { type: number }
+        totalEarnings:    { type: number }
+        photoUrl:         { type: ["string", "null"] }
+        specialization:   { type: string }
+
+    # ── SUGGESTION ─────────────────────────────────────────────────
+    Suggestion:
+      type: object
+      required: [id, clientName, comment, status, createdAt]
+      properties:
+        id:         { type: number }
+        clientName: { type: string }
+        telegram:   { type: ["string", "null"] }
+        comment:    { type: string }
+        status:     { type: string }
+        createdAt:  { type: string }
+
+    SuggestionStatusUpdate:
+      type: object
+      required: [status]
+      properties:
+        status: { type: string }

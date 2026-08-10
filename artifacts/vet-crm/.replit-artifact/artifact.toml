@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "VetCRM — Административная панель"
+description = "Полноценная CRM-система для управления ветеринарным сервисом на дому. Включает: дашборд со статистикой, управление заказами, ветеринарами, клиентами, питомцами, медкартами, финансами и аналитикой. Продолжение дизайна veterinarathome — тёмная тема с зелёными акцентами."
+version = "1.0.0"
+id = "artifacts/vet-crm"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23881
+
+[services.development]
+run = "pnpm --filter @workspace/vet-crm run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/vet-crm", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/vet-crm/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23881"
+BASE_PATH = "/"
