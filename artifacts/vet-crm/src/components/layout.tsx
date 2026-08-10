@@ -15,6 +15,7 @@ import {
   Menu,
   X
 } from "lucide-react";
+import logoUrl from "/logo.jpeg";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -69,11 +70,17 @@ export function Layout({ children }: { children: ReactNode }) {
         "fixed md:static inset-y-0 left-0 z-40 w-[260px] bg-[rgba(6,13,6,0.97)] border-r border-[rgba(74,222,128,0.08)] flex flex-col transition-transform duration-300 ease-in-out backdrop-blur-xl",
         isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
       )}>
-        <div className="p-6 flex items-center gap-3 animate-slide-left">
-          <div className="w-10 h-10 rounded-full bg-green-500/10 border border-green-500/30 flex items-center justify-center" style={{ animation: 'glowPulse 3s infinite' }}>
-            <Stethoscope className="text-green-400 w-5 h-5" />
+        <div className="p-5 flex items-center gap-3 animate-slide-left border-b border-[rgba(74,222,128,0.08)]">
+          <img
+            src={logoUrl}
+            alt="Ветеринар на дом"
+            className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+            style={{ boxShadow: '0 0 12px rgba(74,222,128,0.35)', border: '1.5px solid rgba(74,222,128,0.3)' }}
+          />
+          <div className="flex flex-col leading-tight">
+            <span className="font-bold text-base tracking-tight text-white">Ветеринар на дом</span>
+            <span className="text-[11px] text-green-400/60 font-medium tracking-wide">Админ панель CRM</span>
           </div>
-          <span className="font-bold text-xl tracking-tight text-white">VetCRM</span>
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 py-2 space-y-6">
