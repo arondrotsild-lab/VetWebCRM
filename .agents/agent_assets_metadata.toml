@@ -1,0 +1,23 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "zWaUiTdfWgbARj23jqmeA"
+uri = "file://.local/outputs/-------------------------------------------.pdf"
+type = "pdf"
+title = "Ветеринар на дом — инвесторская презентация.pdf"
+logical_id = "10e5376c-c986-47eb-ab42-36be8e74dd7b"
+
+[[outputs]]
+id = "_zaHvnN3C4YJswTpsOJCw"
+uri = "file://deliverables/veterinar-na-dom-biznes-plan.docx"
+type = "word_document"
+title = "Бизнес-план «Ветеринар на дом»"
+description = "Расширенный инвестиционный бизнес-план в формате Word: продукт, услуги, юнит-экономика, города, план роста на 5 месяцев, маркетинг, операции, риски и финансовый результат."
+logical_id = "d716df56-cf7f-4c42-8076-a1e1b83a5dad"
+content_hash = "sha256:decaa616096c2fe3c2b1dcf97a8230967ecbd6003e23db0040df46cfeb963652"
+size = 522147
+mtime_ms = 1788938847159
+storage_uri = "gcs://replit-rams-assets-archer/rams/assets/repl:d63fcf8b-038c-49a6-970e-517503ba6a7c/d716df56-cf7f-4c42-8076-a1e1b83a5dad/717c6457-e74e-460e-b6ac-8efd7671c741"
+storage_version_token = "1788938858196616"
+content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
