@@ -1,0 +1,28 @@
+kind = "slides"
+previewPath = "/vet-home-investor-deck/"
+title = "Ветеринар на дом — инвесторская презентация"
+description = "Продающая презентация инвестиционной модели сервиса доступной профилактической ветеринарии в Москве, Казани и Хабаровске."
+version = "1.0.0"
+id = "artifacts/vet-home-investor-deck"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/vet-home-investor-deck/" ]
+localPort = 24830
+
+[services.development]
+run = "pnpm --filter @workspace/vet-home-investor-deck run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/vet-home-investor-deck", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/vet-home-investor-deck/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24830"
+BASE_PATH = "/vet-home-investor-deck/"
