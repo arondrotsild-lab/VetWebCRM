@@ -21,3 +21,17 @@ mtime_ms = 1788938847159
 storage_uri = "gcs://replit-rams-assets-archer/rams/assets/repl:d63fcf8b-038c-49a6-970e-517503ba6a7c/d716df56-cf7f-4c42-8076-a1e1b83a5dad/717c6457-e74e-460e-b6ac-8efd7671c741"
 storage_version_token = "1788938858196616"
 content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+[[outputs]]
+id = "ySkVDgX-7Q6YqEiD2mXhJ"
+uri = "file://deliverables/IMG_3400.jpg"
+type = "image"
+title = "IMG_3400 — JPG"
+description = "Изображение конвертировано из HEIC в JPG с сохранением исходной ориентации и высокого качества."
+logical_id = "26951248-a083-44c1-93ab-cc49131c3f83"
+content_hash = "sha256:8bd839577584e6ae9ddd7863674bd706852e1a283ceb593f34622721d9186cb9"
+size = 980031
+mtime_ms = 1790082399358
+storage_uri = "gcs://replit-rams-assets-archer/rams/assets/repl:d63fcf8b-038c-49a6-970e-517503ba6a7c/26951248-a083-44c1-93ab-cc49131c3f83/11e7d420-ead7-4724-9cef-6edce0d16fb9"
+storage_version_token = "1790082408320782"
+content_type = "image/jpeg"
