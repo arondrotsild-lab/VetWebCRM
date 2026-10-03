@@ -34,7 +34,7 @@
   --background: #101b12;
   --foreground: #f1f6f1;
   --border: rgba(148,190,151,0.15);
-  --card: rgba(17,34,21,0.58);
+  --card: rgba(17,34,21,0.42);
   --card-foreground: #f1f6f1;
   --primary: #22c55e;
   --primary-foreground: #ffffff;
@@ -73,28 +73,28 @@ body {
   .app-shell {
     background-color: #101b12;
     background-image:
-      linear-gradient(rgba(18,29,20,0.92), rgba(18,29,20,0.92)),
+      linear-gradient(rgba(18,29,20,0.88), rgba(18,29,20,0.88)),
       url('/vet-home-background.webp');
     background-position: center;
     background-size: cover;
     background-attachment: fixed;
   }
   .glass-card {
-    background: rgba(17,34,21,0.58);
-    border: 1px solid rgba(148,190,151,0.18);
+    background: rgba(17,34,21,0.42);
+    border: 1px solid rgba(148,190,151,0.22);
     backdrop-filter: blur(11px);
     border-radius: 0.75rem;
   }
   .glass-card-hover {
-    background: rgba(17,34,21,0.58);
-    border: 1px solid rgba(148,190,151,0.18);
+    background: rgba(17,34,21,0.42);
+    border: 1px solid rgba(148,190,151,0.22);
     backdrop-filter: blur(11px);
     border-radius: 0.75rem;
     transition: all 0.2s;
   }
   .glass-card-hover:hover {
     border-color: rgba(130,207,143,0.34);
-    background: rgba(24,43,27,0.72);
+    background: rgba(24,43,27,0.58);
     transform: translateY(-2px);
     box-shadow: 0 14px 35px rgba(0,0,0,0.20), 0 0 22px rgba(74,222,128,0.08);
   }
