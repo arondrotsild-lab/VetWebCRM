@@ -1,16 +1,20 @@
 import { useGetPet, useGetPetMedicalRecords } from "@workspace/api-client-react";
 import { useParams, Link } from "wouter";
 import { formatDate } from "@/lib/utils";
-import { Loader2, ArrowLeft, Dog, User, Activity, FileText, Calendar, Weight } from "lucide-react";
+import { Loader2, ArrowLeft, Dog, User, Activity, FileText, Calendar } from "lucide-react";
 
 export default function PetDetailPage() {
   const params = useParams();
   const id = parseInt(params.id || "0", 10);
 
-  const { data: pet, isLoading: petLoading } = useGetPet(id, { query: { enabled: !!id } });
-  const { data: recordsData, isLoading: recordsLoading } = useGetPetMedicalRecords(id, { query: { enabled: !!id } });
+  const { data: pet, isLoading: petLoading, isError: petError } = useGetPet(id);
+  const {
+    data: recordsData,
+    isLoading: recordsLoading,
+    isError: recordsError,
+  } = useGetPetMedicalRecords(id);
 
-  if (petLoading || !pet) {
+  if (petLoading) {
     return (
       <div className="flex items-center justify-center h-full min-h-[500px]">
         <Loader2 className="w-8 h-8 text-green-400 animate-spin" />
@@ -18,7 +22,21 @@ export default function PetDetailPage() {
     );
   }
 
-  const records = recordsData?.data || [];
+  if (!pet) {
+    return (
+      <div className="glass-card p-8 max-w-xl mx-auto text-center space-y-4">
+        <h1 className="text-2xl font-bold">{petError ? "Не удалось загрузить ветпаспорт" : "Питомец не найден"}</h1>
+        <p className="text-muted-foreground">
+          {petError ? "Проверьте соединение и попробуйте ещё раз." : "Возможно, карточка питомца была удалена."}
+        </p>
+        <Link href="/pets" className="inline-flex items-center gap-2 text-green-400 hover:underline">
+          <ArrowLeft className="w-4 h-4" /> К списку питомцев
+        </Link>
+      </div>
+    );
+  }
+
+  const records = recordsData ?? [];
 
   return (
     <div className="space-y-6 animate-fade-in max-w-5xl mx-auto">
@@ -27,7 +45,8 @@ export default function PetDetailPage() {
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">Медицинская карта</h1>
+          <h1 className="text-3xl font-bold flex items-center gap-3">Ветпаспорт</h1>
+          <p className="text-sm text-muted-foreground mt-1">Данные питомца, владельца и история обращений</p>
         </div>
       </div>
 
@@ -45,7 +64,7 @@ export default function PetDetailPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h2 className="text-3xl font-bold mb-2">{pet.name}</h2>
-                <div className="flex flex-wrap gap-2 text-sm">
+                <div className="flex flex-wrap items-center gap-2 text-sm">
                   <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full border border-green-500/30">
                     {pet.species}
                   </span>
@@ -54,6 +73,9 @@ export default function PetDetailPage() {
                       {pet.breed}
                     </span>
                   )}
+                  <span className="px-3 py-1 bg-[rgba(10,26,10,0.5)] text-muted-foreground rounded-full border border-[rgba(74,222,128,0.2)]">
+                    Паспорт № {pet.id}
+                  </span>
                 </div>
               </div>
               
@@ -105,6 +127,10 @@ export default function PetDetailPage() {
 
         {recordsLoading ? (
           <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 text-green-400 animate-spin" /></div>
+        ) : recordsError ? (
+          <div className="glass-card p-8 text-center text-amber-300">
+            Не удалось загрузить медицинскую историю питомца.
+          </div>
         ) : records.length > 0 ? (
           <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-green-500/50 before:via-green-500/20 before:to-transparent">
             {records.map((record, idx) => (
@@ -117,9 +143,16 @@ export default function PetDetailPage() {
                 <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] glass-card p-5 group-hover:border-green-500/30 transition-all">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-3">
                     <span className="font-mono text-sm text-green-400">{formatDate(record.createdAt)}</span>
-                    <span className="text-xs px-2 py-1 rounded bg-[rgba(10,26,10,0.6)] border border-green-500/10 flex items-center gap-1">
-                      <User className="w-3 h-3" /> Врач: {record.vetName || 'Неизвестно'}
-                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="text-xs px-2 py-1 rounded bg-[rgba(10,26,10,0.6)] border border-green-500/10 flex items-center gap-1">
+                        <User className="w-3 h-3" /> Врач: {record.vetName || 'Неизвестно'}
+                      </span>
+                      {record.orderId && (
+                        <Link href={`/orders/${record.orderId}`} className="text-xs px-2 py-1 rounded bg-green-500/10 border border-green-500/20 text-green-300 hover:bg-green-500/20">
+                          Заказ #{record.orderId}
+                        </Link>
+                      )}
+                    </div>
                   </div>
                   
                   <div className="space-y-3">
@@ -141,6 +174,23 @@ export default function PetDetailPage() {
                         <div className="text-sm font-mono text-blue-200 bg-blue-500/5 p-2 rounded border border-blue-500/10">
                           {record.prescription}
                         </div>
+                      </div>
+                    )}
+
+                    {record.nextVisit && (
+                      <div className="pt-2 border-t border-[rgba(74,222,128,0.1)]">
+                        <div className="text-xs text-muted-foreground mb-1 uppercase tracking-wider font-semibold">Следующий визит</div>
+                        <div className="text-sm flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-green-400" />
+                          {formatDate(record.nextVisit)}
+                        </div>
+                      </div>
+                    )}
+
+                    {record.notes && (
+                      <div className="pt-2 border-t border-[rgba(74,222,128,0.1)]">
+                        <div className="text-xs text-muted-foreground mb-1 uppercase tracking-wider font-semibold">Заметки</div>
+                        <div className="text-sm leading-relaxed">{record.notes}</div>
                       </div>
                     )}
                   </div>

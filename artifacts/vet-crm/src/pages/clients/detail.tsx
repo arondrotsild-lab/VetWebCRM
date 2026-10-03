@@ -1,16 +1,16 @@
 import { useGetClient, useGetClientOrders, useGetClientPets } from "@workspace/api-client-react";
 import { useParams, Link } from "wouter";
 import { formatCurrency, formatDate, getStatusLabel, getStatusColor } from "@/lib/utils";
-import { Loader2, ArrowLeft, Phone, Mail, Calendar, Dog, ShoppingBag, User, Crown } from "lucide-react";
+import { Loader2, ArrowLeft, Phone, Mail, Calendar, Dog, ShoppingBag, User, Crown, FileText } from "lucide-react";
 import { getClientSegment, getClientSegmentLabel } from "@/lib/client-segments";
 
 export default function ClientDetailPage() {
   const params = useParams();
   const id = parseInt(params.id || "0", 10);
 
-  const { data: client, isLoading: clientLoading } = useGetClient(id, { query: { enabled: !!id } });
-  const { data: ordersData, isLoading: ordersLoading } = useGetClientOrders(id, { query: { enabled: !!id } });
-  const { data: petsData, isLoading: petsLoading } = useGetClientPets(id, { query: { enabled: !!id } });
+  const { data: client, isLoading: clientLoading } = useGetClient(id);
+  const { data: ordersData, isLoading: ordersLoading } = useGetClientOrders(id);
+  const { data: petsData, isLoading: petsLoading } = useGetClientPets(id);
 
   if (clientLoading || !client) {
     return (
@@ -20,8 +20,8 @@ export default function ClientDetailPage() {
     );
   }
 
-  const pets = petsData?.data || [];
-  const orders = ordersData?.orders || [];
+  const pets = petsData ?? [];
+  const orders = ordersData ?? [];
   const clientSegment = getClientSegment(client.ordersCount);
   const segmentStyles = clientSegment === "vip"
     ? "text-amber-300 bg-amber-500/10 border-amber-400/20"
@@ -112,15 +112,21 @@ export default function ClientDetailPage() {
               ) : pets.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {pets.map(pet => (
-                    <Link key={pet.id} href={`/pets/${pet.id}`} className="glass-card-hover p-4 flex items-center gap-4 group">
-                      <div className="w-12 h-12 rounded-full bg-[rgba(10,26,10,0.8)] border border-green-500/20 flex items-center justify-center">
-                        <Dog className="w-6 h-6 text-muted-foreground group-hover:text-green-400 transition-colors" />
+                    <div key={pet.id} className="glass-card-hover p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-4 min-w-0">
+                        <div className="w-12 h-12 rounded-full bg-[rgba(10,26,10,0.8)] border border-green-500/20 flex items-center justify-center shrink-0">
+                          <Dog className="w-6 h-6 text-green-400" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-medium text-lg truncate">{pet.name}</div>
+                          <div className="text-sm text-muted-foreground">{pet.species} {pet.breed ? `(${pet.breed})` : ''}</div>
+                        </div>
                       </div>
-                      <div>
-                        <div className="font-medium text-lg group-hover:text-green-400 transition-colors">{pet.name}</div>
-                        <div className="text-sm text-muted-foreground">{pet.species} {pet.breed ? `(${pet.breed})` : ''}</div>
-                      </div>
-                    </Link>
+                      <Link href={`/pets/${pet.id}`} className="btn-primary inline-flex items-center justify-center gap-2 text-sm whitespace-nowrap shrink-0">
+                        <FileText className="w-4 h-4" />
+                        Ветпаспорт
+                      </Link>
+                    </div>
                   ))}
                 </div>
               ) : (
