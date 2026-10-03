@@ -1,7 +1,7 @@
 import { useListPets } from "@workspace/api-client-react";
 import { useState } from "react";
 import { Link } from "wouter";
-import { Search, Loader2, Dog, User } from "lucide-react";
+import { Search, Loader2, Dog, User, FileText } from "lucide-react";
 
 export default function PetsPage() {
   const [search, setSearch] = useState("");
@@ -88,12 +88,21 @@ export default function PetsPage() {
                       {pet.id}
                     </td>
                     <td className="p-4">
-                      <Link href={`/pets/${pet.id}`} className="text-sm font-semibold hover:text-green-400 transition-colors flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[rgba(10,26,10,0.8)] border border-green-500/20 flex items-center justify-center text-muted-foreground">
-                          <Dog className="w-5 h-5" />
-                        </div>
-                        {pet.name}
-                      </Link>
+                      <div className="space-y-2">
+                        <Link href={`/pets/${pet.id}`} className="text-sm font-semibold hover:text-green-400 transition-colors flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-[rgba(10,26,10,0.8)] border border-green-500/20 flex items-center justify-center text-muted-foreground shrink-0">
+                            <Dog className="w-5 h-5" />
+                          </div>
+                          {pet.name}
+                        </Link>
+                        <Link
+                          href={`/pets/${pet.id}`}
+                          className="btn-vetpassport inline-flex items-center justify-center gap-1.5 text-xs whitespace-nowrap"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          Ветпаспорт
+                        </Link>
+                      </div>
                     </td>
                     <td className="p-4">
                       <div className="text-sm">

@@ -122,8 +122,8 @@ export default function ClientDetailPage() {
                           <div className="text-sm text-muted-foreground">{pet.species} {pet.breed ? `(${pet.breed})` : ''}</div>
                         </div>
                       </div>
-                      <Link href={`/pets/${pet.id}`} className="btn-primary inline-flex items-center justify-center gap-2 text-sm whitespace-nowrap shrink-0">
-                        <FileText className="w-4 h-4" />
+                      <Link href={`/pets/${pet.id}`} className="btn-vetpassport inline-flex w-fit self-start items-center justify-center gap-1.5 text-xs whitespace-nowrap shrink-0 sm:self-auto">
+                        <FileText className="w-3.5 h-3.5" />
                         Ветпаспорт
                       </Link>
                     </div>
