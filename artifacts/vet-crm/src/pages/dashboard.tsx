@@ -1,25 +1,20 @@
 import { 
-  useGetDashboardStats, 
-  useGetDashboardRevenueChart, 
-  useGetDashboardOrdersByStatus, 
   useGetDashboardRecentOrders, 
   useGetDashboardTopVets 
 } from "@workspace/api-client-react";
 import { formatCurrency, formatDate, getStatusLabel, getStatusColor, getTierBadge, cn } from "@/lib/utils";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell } from "recharts";
 import { Link } from "wouter";
 import { ArrowUpRight, TrendingUp, Users, ClipboardList, ActivitySquare, Loader2 } from "lucide-react";
+import { dashboardMetrics, formatDashboardCount } from "@/lib/dashboard-metrics";
 
-const PIE_COLORS = ['#3b82f6', '#22c55e', '#10b981', '#f59e0b', '#6b7280'];
+const activeOrdersShare = dashboardMetrics.activeOrders / dashboardMetrics.ordersToday;
+const remainingOrdersToday = dashboardMetrics.ordersToday - dashboardMetrics.activeOrders;
 
 export default function DashboardPage() {
-  const { data: stats, isLoading: statsLoading } = useGetDashboardStats();
-  const { data: chartData, isLoading: chartLoading } = useGetDashboardRevenueChart();
-  const { data: statusData, isLoading: statusLoading } = useGetDashboardOrdersByStatus();
   const { data: recentOrders, isLoading: ordersLoading } = useGetDashboardRecentOrders();
   const { data: topVets, isLoading: vetsLoading } = useGetDashboardTopVets();
 
-  if (statsLoading || chartLoading || statusLoading || ordersLoading || vetsLoading) {
+  if (ordersLoading || vetsLoading) {
     return (
       <div className="flex items-center justify-center h-full min-h-[500px]">
         <Loader2 className="w-8 h-8 text-green-400 animate-spin" />
@@ -32,7 +27,7 @@ export default function DashboardPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold">Дашборд</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Главные метрики за сегодня</p>
+          <p className="text-muted-foreground mt-1 text-sm">Ключевые показатели работы сервиса</p>
         </div>
       </div>
 
@@ -43,9 +38,9 @@ export default function DashboardPage() {
             <ClipboardList className="w-16 h-16 text-green-400" />
           </div>
           <div className="text-muted-foreground text-sm font-medium">Заказы сегодня</div>
-          <div className="text-3xl font-bold mt-2 font-mono">{stats?.ordersToday || 0}</div>
+          <div className="text-3xl font-bold mt-2 font-mono">{formatDashboardCount(dashboardMetrics.ordersToday)}</div>
           <div className="text-xs mt-2 text-green-400 flex items-center gap-1">
-            <ArrowUpRight size={14} /> Активно: {stats?.activeOrders || 0}
+            <ArrowUpRight size={14} /> Активно: {formatDashboardCount(dashboardMetrics.activeOrders)}
           </div>
         </div>
         
@@ -54,9 +49,9 @@ export default function DashboardPage() {
             <TrendingUp className="w-16 h-16 text-green-400" />
           </div>
           <div className="text-muted-foreground text-sm font-medium">Выручка сегодня</div>
-          <div className="text-3xl font-bold mt-2 font-mono text-green-400">{formatCurrency(stats?.revenueToday || 0)}</div>
+          <div className="text-3xl font-bold mt-2 font-mono text-green-400">{formatCurrency(dashboardMetrics.revenueToday)}</div>
           <div className="text-xs mt-2 text-muted-foreground flex items-center gap-1">
-            Всего: {formatCurrency(stats?.totalRevenue || 0)}
+            Всего: {formatCurrency(dashboardMetrics.totalRevenue)}
           </div>
         </div>
 
@@ -65,9 +60,9 @@ export default function DashboardPage() {
             <ActivitySquare className="w-16 h-16 text-green-400" />
           </div>
           <div className="text-muted-foreground text-sm font-medium">Врачи онлайн</div>
-          <div className="text-3xl font-bold mt-2 font-mono">{stats?.activeVets || 0}</div>
+          <div className="text-3xl font-bold mt-2 font-mono">{formatDashboardCount(dashboardMetrics.activeVets)}</div>
           <div className="text-xs mt-2 text-muted-foreground flex items-center gap-1">
-            Из {stats?.totalVets || 0} зарегистрированных
+            Из {formatDashboardCount(dashboardMetrics.totalVets)} зарегистрированных
           </div>
         </div>
 
@@ -76,67 +71,56 @@ export default function DashboardPage() {
             <Users className="w-16 h-16 text-green-400" />
           </div>
           <div className="text-muted-foreground text-sm font-medium">Всего клиентов</div>
-          <div className="text-3xl font-bold mt-2 font-mono">{stats?.totalClients || 0}</div>
+          <div className="text-3xl font-bold mt-2 font-mono">{formatDashboardCount(dashboardMetrics.totalClients)}</div>
           <div className="text-xs mt-2 text-muted-foreground flex items-center gap-1">
-            Питомцев: {stats?.totalPets || 0}
+            Питомцев: {formatDashboardCount(dashboardMetrics.totalPets)}
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Revenue Chart */}
+        {/* Thirty-day revenue summary */}
         <div className="glass-card p-5 lg:col-span-2 flex flex-col">
-          <h2 className="text-lg font-semibold mb-4">Выручка за 30 дней</h2>
-          <div className="flex-1 min-h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData || []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(74,222,128,0.1)" vertical={false} />
-                <XAxis dataKey="date" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => v.split('-').slice(1).join('.')} />
-                <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => `${v/1000}k`} />
-                <Tooltip 
-                  cursor={{ fill: 'rgba(74,222,128,0.05)' }}
-                  contentStyle={{ backgroundColor: 'rgba(10,26,10,0.9)', borderColor: 'rgba(74,222,128,0.2)', borderRadius: '8px' }}
-                  itemStyle={{ color: '#4ade80' }}
-                  formatter={(value: number) => formatCurrency(value)}
-                  labelStyle={{ color: '#fff', marginBottom: '4px' }}
-                />
-                <Bar dataKey="revenue" fill="#22c55e" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+            <div>
+              <h2 className="text-lg font-semibold">Выручка за 30 дней</h2>
+              <p className="text-xs text-muted-foreground mt-1">Сводный показатель за весь период</p>
+            </div>
+          </div>
+          <div className="flex-1 min-h-[300px] flex flex-col items-center justify-center text-center rounded-xl bg-green-500/[0.04] border border-green-500/10 px-4">
+            <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Общая выручка · 30 дней</div>
+            <div className="text-4xl sm:text-5xl xl:text-6xl font-bold font-mono text-green-400 mt-4">
+              {formatCurrency(dashboardMetrics.revenueLast30Days)}
+            </div>
+            <div className="mt-4 text-sm text-muted-foreground">
+              В среднем за день: {formatCurrency(Math.round(dashboardMetrics.revenueLast30Days / 30))}
+            </div>
+            <div className="mt-7 h-1 w-2/3 max-w-sm rounded-full bg-gradient-to-r from-green-950 via-green-500 to-emerald-300" aria-hidden="true" />
           </div>
         </div>
 
-        {/* Status Donut */}
+        {/* Today's active orders */}
         <div className="glass-card p-5 flex flex-col">
-          <h2 className="text-lg font-semibold mb-4">Статусы заказов</h2>
-          <div className="flex-1 min-h-[300px] relative">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={statusData || []}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={80}
-                  outerRadius={110}
-                  paddingAngle={2}
-                  dataKey="count"
-                  nameKey="status"
-                  stroke="none"
-                >
-                  {(statusData || []).map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  contentStyle={{ backgroundColor: 'rgba(10,26,10,0.9)', borderColor: 'rgba(74,222,128,0.2)', borderRadius: '8px' }}
-                  itemStyle={{ color: '#fff' }}
-                  formatter={(val: number, name: string) => [val, getStatusLabel(name)]}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-3xl font-bold font-mono">{stats?.activeOrders || 0}</span>
-              <span className="text-xs text-muted-foreground">Активных</span>
+          <h2 className="text-lg font-semibold mb-2">Активность заказов сегодня</h2>
+          <p className="text-sm text-muted-foreground">Активные заказы относительно общего числа</p>
+          <div className="flex-1 flex flex-col justify-center py-8">
+            <div className="flex items-baseline gap-2">
+              <span className="text-5xl font-bold font-mono text-green-400">{formatDashboardCount(dashboardMetrics.activeOrders)}</span>
+              <span className="text-muted-foreground">из {formatDashboardCount(dashboardMetrics.ordersToday)} заказов</span>
+            </div>
+            <div
+              className="w-full h-3 rounded-full bg-white/10 mt-6 overflow-hidden"
+              role="progressbar"
+              aria-label="Доля активных заказов сегодня"
+              aria-valuenow={dashboardMetrics.activeOrders}
+              aria-valuemin={0}
+              aria-valuemax={dashboardMetrics.ordersToday}
+            >
+              <div className="h-full rounded-full bg-green-400" style={{ width: `${activeOrdersShare * 100}%` }} />
+            </div>
+            <div className="flex justify-between text-xs mt-3 text-muted-foreground">
+              <span>Активно {formatDashboardCount(dashboardMetrics.activeOrders)} ({(activeOrdersShare * 100).toFixed(1)}%)</span>
+              <span>Остальные {formatDashboardCount(remainingOrdersToday)}</span>
             </div>
           </div>
         </div>
@@ -146,7 +130,10 @@ export default function DashboardPage() {
         {/* Recent Orders Table */}
         <div className="glass-card overflow-hidden lg:col-span-2">
           <div className="p-5 border-b border-[rgba(74,222,128,0.1)] flex justify-between items-center">
-            <h2 className="text-lg font-semibold">Недавние заказы</h2>
+            <div>
+              <h2 className="text-lg font-semibold">Недавние заказы</h2>
+              <p className="text-xs text-muted-foreground mt-1">Последние записи в CRM</p>
+            </div>
             <Link href="/orders" className="text-sm text-green-400 hover:text-green-300 transition-colors">
               Все заказы &rarr;
             </Link>
@@ -196,7 +183,10 @@ export default function DashboardPage() {
         {/* Top Vets */}
         <div className="glass-card overflow-hidden flex flex-col">
           <div className="p-5 border-b border-[rgba(74,222,128,0.1)] flex justify-between items-center">
-            <h2 className="text-lg font-semibold">Топ Врачей</h2>
+            <div>
+              <h2 className="text-lg font-semibold">Топ Врачей</h2>
+              <p className="text-xs text-muted-foreground mt-1">Рейтинг по фактическим заказам</p>
+            </div>
           </div>
           <div className="p-4 flex-1 flex flex-col gap-4">
             {(topVets || []).map((vet, idx) => (
