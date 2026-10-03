@@ -1,7 +1,8 @@
 import { useGetClient, useGetClientOrders, useGetClientPets } from "@workspace/api-client-react";
 import { useParams, Link } from "wouter";
 import { formatCurrency, formatDate, getStatusLabel, getStatusColor } from "@/lib/utils";
-import { Loader2, ArrowLeft, Phone, Mail, Calendar, Dog, ShoppingBag, User } from "lucide-react";
+import { Loader2, ArrowLeft, Phone, Mail, Calendar, Dog, ShoppingBag, User, Crown } from "lucide-react";
+import { getClientSegment, getClientSegmentLabel } from "@/lib/client-segments";
 
 export default function ClientDetailPage() {
   const params = useParams();
@@ -21,6 +22,12 @@ export default function ClientDetailPage() {
 
   const pets = petsData?.data || [];
   const orders = ordersData?.orders || [];
+  const clientSegment = getClientSegment(client.ordersCount);
+  const segmentStyles = clientSegment === "vip"
+    ? "text-amber-300 bg-amber-500/10 border-amber-400/20"
+    : clientSegment === "regular"
+      ? "text-green-300 bg-green-500/10 border-green-400/20"
+      : "text-sky-300 bg-sky-500/10 border-sky-400/20";
 
   return (
     <div className="space-y-6 animate-fade-in max-w-6xl mx-auto">
@@ -42,7 +49,13 @@ export default function ClientDetailPage() {
                 {client.name.substring(0, 2).toUpperCase()}
               </div>
               <div>
-                <h2 className="text-xl font-bold">{client.name}</h2>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-xl font-bold">{client.name}</h2>
+                  <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${segmentStyles}`}>
+                    {clientSegment === "vip" && <Crown className="w-3 h-3" />}
+                    {getClientSegmentLabel(clientSegment)}
+                  </span>
+                </div>
                 <div className="text-sm text-muted-foreground mt-1">ID: #{client.id}</div>
               </div>
             </div>
