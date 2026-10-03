@@ -56,7 +56,7 @@ export function Layout({ children }: { children: ReactNode }) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-[#040a04] overflow-hidden">
+    <div className="app-shell flex h-screen overflow-hidden">
       {/* Mobile Toggle */}
       <button 
         className="md:hidden fixed top-4 right-4 z-50 p-2 glass-card rounded-md"
@@ -67,7 +67,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed md:static inset-y-0 left-0 z-40 w-[260px] bg-[rgba(6,13,6,0.97)] border-r border-[rgba(74,222,128,0.08)] flex flex-col transition-transform duration-300 ease-in-out backdrop-blur-xl",
+        "fixed md:static inset-y-0 left-0 z-40 w-[260px] bg-[rgba(11,21,13,0.91)] border-r border-[rgba(148,190,151,0.13)] flex flex-col transition-transform duration-300 ease-in-out backdrop-blur-xl",
         isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
       )}>
         <div className="p-5 flex items-center gap-3 animate-slide-left border-b border-[rgba(74,222,128,0.08)]">
@@ -124,7 +124,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
-        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-green-900/10 via-[#040a04]/0 to-transparent z-0"></div>
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-emerald-100/[0.07] via-transparent to-transparent z-0"></div>
         <div className="flex-1 overflow-y-auto p-4 md:p-8 z-10 relative">
           <div className="max-w-7xl mx-auto space-y-6">
             {children}
