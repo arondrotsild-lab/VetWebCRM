@@ -4,6 +4,7 @@ import Icon from './Icon';
 import { Spark } from './Charts';
 import { pct, STATUS } from '../lib/format';
 import { TONES } from './Tile3D';
+import Icon3D, { tiltHandlers } from './Icon3D';
 
 export function PageHead({ eyebrow, title, sub, right }: { eyebrow?: string; title: string; sub?: ReactNode; right?: ReactNode }) {
   return (
@@ -53,13 +54,14 @@ export function Kpi({ icon, label, value, sub, delta, tone = 'coffee', spark, on
   const dark = t.dark;
   return (
     <button type="button" onClick={onClick} disabled={!onClick}
-      className="tile3d relative overflow-hidden rounded-[24px] p-4 md:p-5 text-left flex flex-col min-h-[132px] md:min-h-[150px] disabled:cursor-default" style={{ background: t.bg }}>
+      className="tile3d tilt3d relative overflow-hidden rounded-[24px] p-4 md:p-5 text-left flex flex-col min-h-[132px] md:min-h-[150px] disabled:cursor-default" style={{ background: t.bg }} {...tiltHandlers}>
       <span className="tile3d-gloss" />
-      <span className="tile3d-icon text-[30px] md:text-[38px] right-3 top-3">{icon}</span>
-      <span className={`relative z-[1] text-[11px] md:text-xs font-bold uppercase tracking-wider pr-12 ${dark ? 'text-[#1E140D]/70' : 'text-white/80'}`}>{label}</span>
-      <span className={`relative z-[1] mt-auto pt-3 block font-black text-[22px] md:text-[28px] leading-none money ${dark ? 'text-[#1E140D]' : 'text-white'}`}
+      <span className="tile-sweep" />
+      <Icon3D emoji={icon} tone="cream" size={44} className="!absolute z-[2] right-3 top-3" />
+      <span className={`relative z-[3] text-[11px] md:text-xs font-bold uppercase tracking-wider pr-14 ${dark ? 'text-[#1E140D]/70' : 'text-white/80'}`}>{label}</span>
+      <span className={`relative z-[3] mt-auto pt-3 block font-black text-[22px] md:text-[28px] leading-none money ${dark ? 'text-[#1E140D]' : 'text-white'}`}
         style={{ textShadow: dark ? 'none' : '0 2px 6px rgba(0,0,0,.35)' }}>{value}</span>
-      <span className="relative z-[1] mt-2 flex items-center gap-2 flex-wrap">
+      <span className="relative z-[3] mt-2 flex items-center gap-2 flex-wrap">
         {delta !== undefined && (
           <span className={`chip money ${dark ? 'bg-black/15 text-[#1E140D]' : 'bg-black/25 text-white'}`}>
             {delta >= 0 ? '▲' : '▼'} {pct(Math.abs(delta), Math.abs(delta) < 0.1 ? 1 : 0)}

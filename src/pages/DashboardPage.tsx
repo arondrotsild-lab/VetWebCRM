@@ -3,6 +3,7 @@ import { Bars, Area, Donut, HBars, Heatmap, Ring } from '../components/Charts';
 import { Card, Kpi, PageHead, Loader, ErrorBox, Avatar, StatusChip } from '../components/ui';
 import { useCrm, money, num, rub, pct, delta, monthShort, monthLong, dateShort, time, speciesEmoji, PALETTE, plural } from '../lib/format';
 import { Month } from '../lib/api';
+import Icon3D from '../components/Icon3D';
 
 export const monthRows = (months: Month[]) => months.map((m) => ({ label: monthShort(m.m), full: monthLong(m.m), ...m }));
 
@@ -107,7 +108,7 @@ export default function DashboardPage() {
           <div className="space-y-1">
             {data.live.map((o: { id: number; status: string; scheduled_at: string; total_price: number; service: string; icon: string; client: string; pet: string; species: string; vet: string }) => (
               <Link key={o.id} to={`/orders/${o.id}`} className="flex items-center gap-3 p-2 rounded-2xl hover:bg-white/[0.05]">
-                <span className="w-11 h-11 rounded-2xl bg-white/[0.06] flex items-center justify-center text-xl flex-shrink-0">{o.icon}</span>
+                <Icon3D emoji={o.icon} size={44} still />
                 <div className="min-w-0 flex-1">
                   <div className="font-bold truncate">{`${o.service} · ${speciesEmoji(o.species)} ${o.pet}`}</div>
                   <div className="text-[11px] text-white/50 truncate">{`${o.vet ?? 'ищем врача'} → ${o.client} · ${time(o.scheduled_at)}`}</div>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Bars, Donut, Funnel } from '../components/Charts';
 import { Card, Kpi, PageHead, Loader, ErrorBox } from '../components/ui';
 import { useCrm, money, rub, num, pct, monthShort, monthLong, PALETTE } from '../lib/format';
+import Icon3D from '../components/Icon3D';
 
 interface Ch { channel: string; icon: string; spend: number; impressions: number; clicks: number; leads: number; clients: number; revenue: number }
 
@@ -59,7 +60,7 @@ export default function MarketingPage() {
             return (
               <div key={c.channel} className="rounded-2xl bg-white/[0.035] border border-white/10 p-3 md:p-4">
                 <div className="flex items-start gap-3">
-                  <span className="w-11 h-11 rounded-2xl bg-white/[0.07] flex items-center justify-center text-xl flex-shrink-0 glass3d">{c.icon}</span>
+                  <Icon3D emoji={c.icon} size={44} still />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
                       <div className="font-bold leading-snug">{c.channel}</div>

@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Bars, Donut, HBars } from '../components/Charts';
 import { Card, Kpi, PageHead, Loader, ErrorBox, Avatar, Stars, StatusChip, Segmented, Stat, Pill, Search } from '../components/ui';
 import { useCrm, money, rub, num, pct, monthShort, monthLong, dateLong, dateShort, speciesEmoji, PALETTE, dec } from '../lib/format';
+import Icon3D from '../components/Icon3D';
 
 interface V { id: number; name: string; phone: string; photo_url: string | null; specialization: string; experience_years: number; district: string | null; is_available: boolean;
   created_at: string; transport: string; total: number; n30: number; rev30: number; pay30: number; rev_all: number; rating: number; reviews: number; cancel30: number;
@@ -137,7 +138,7 @@ export function VetDetailPage() {
           <div className="divide-y divide-white/5">
             {data.orders.map((o: { id: number; status: string; scheduled_at: string; total_price: number; vet_payout: number; client_rating: number | null; service: string; icon: string; client: string; pet: string; species: string }) => (
               <Link key={o.id} to={`/orders/${o.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-white/[0.04]">
-                <span className="w-10 h-10 rounded-2xl bg-white/[0.06] flex items-center justify-center text-lg flex-shrink-0">{o.icon}</span>
+                <Icon3D emoji={o.icon} size={40} still />
                 <div className="min-w-0 flex-1"><div className="font-bold text-sm truncate">{`${o.service} · ${speciesEmoji(o.species)} ${o.pet}`}</div><div className="text-[11px] text-white/50 truncate">{`${o.client} · ${dateShort(o.scheduled_at)}`}</div></div>
                 <div className="text-right flex-shrink-0"><div className="font-black text-sm money">{rub(o.total_price)}</div>{o.status === 'completed' ? <div className="text-[11px] text-green-300 money">{`врачу ${rub(o.vet_payout)}`}</div> : <StatusChip status={o.status} />}</div>
               </Link>

@@ -4,6 +4,9 @@ import Icon from './Icon';
 import { useAuth } from '../lib/auth';
 import LangMenu from './LangMenu';
 import { LOC } from '../lib/i18n';
+import Icon3D from './Icon3D';
+
+const NAV_TONE: Record<string, string> = {"📊": "yellow", "💰": "green", "📈": "purple", "📣": "red", "🧾": "sky", "👥": "pink", "🐾": "teal", "🩺": "amber", "💉": "green", "🛍️": "purple"};
 
 export const NAV: { to: string; label: string; icon: string; group?: string }[] = [
   { to: '/', label: 'Сводка', icon: '📊', group: 'Компания' },
@@ -56,14 +59,14 @@ function Sidebar() {
             <NavLink to={n.to} end={n.to === '/'}
               className={({ isActive }) => `flex items-center gap-3 px-4 py-2.5 my-0.5 rounded-2xl text-sm font-semibold transition-all ${
                 isActive ? 'bg-green-500/15 text-green-300 border border-green-400/25' : 'text-white/70 hover:text-white hover:bg-white/[0.05] border border-transparent'}`}>
-              <span className="text-[17px] w-6 text-center">{n.icon}</span><span className="flex-1">{n.label}</span>
+              <Icon3D emoji={n.icon} tone={NAV_TONE[n.icon] ?? 'cream'} size={30} still /><span className="flex-1">{n.label}</span>
             </NavLink>
           </div>
         ))}
       </nav>
       <LangMenu up className="relative mx-3 mt-2" />
       <div className="relative m-3 p-3 rounded-2xl bg-black/20 border border-white/10 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg" style={{ background: 'linear-gradient(145deg,#FFE36E,#C98A06)' }}>👑</div>
+        <Icon3D emoji="👑" tone="yellow" size={40} pulse />
         <div className="min-w-0 flex-1">
           <div className="text-sm font-bold truncate">{user?.name ?? 'Руководитель'}</div>
           <div className="text-[11px] text-white/45">Полный доступ</div>

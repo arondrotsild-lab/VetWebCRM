@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { errText, QUICK_LOGIN } from '../lib/api';
 import LangMenu from '../components/LangMenu';
+import Icon3D from '../components/Icon3D';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -34,7 +35,7 @@ export default function LoginPage() {
           className="tile3d relative overflow-hidden w-full rounded-[26px] p-5 text-left flex items-center gap-4 mb-4"
           style={{ background: 'linear-gradient(145deg, #8BD14E 0%, #5E9E2C 45%, #2F5119 100%)' }}>
           <span className="tile3d-gloss" />
-          <span className="relative w-14 h-14 rounded-2xl flex items-center justify-center text-3xl" style={{ background: 'linear-gradient(145deg,#FFE36E,#C98A06)' }}>👑</span>
+          <Icon3D emoji="👑" tone="yellow" size={56} pulse className="!relative z-[2]" />
           <span className="relative flex-1">
             <span className="block font-black text-lg">Быстрый вход</span>
             <span className="block text-sm text-white/85">Руководитель ВетДом · полный доступ</span>

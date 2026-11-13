@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Bars } from '../components/Charts';
 import { Card, Kpi, PageHead, Loader, ErrorBox, Segmented, Search, Pager, Avatar, StatusChip, Stars, Stat, Pill } from '../components/ui';
 import { useCrm, money, rub, num, ago, dateLong, dateShort, monthShort, monthLong, speciesEmoji, plural, CATEGORY_ICON } from '../lib/format';
+import Icon3D from '../components/Icon3D';
 
 interface C { id: number; name: string; phone: string; email: string | null; telegram_nick: string | null; avatar_url: string | null; created_at: string;
   orders: number; services: number; shop: number; ltv: number; last: string | null; first: string | null; pets_n: number; pets: string | null }
@@ -147,7 +148,7 @@ export function ClientDetailPage() {
           <div className="divide-y divide-white/5">
             {data.orders.map((o: { id: number; status: string; scheduled_at: string; total_price: number; bonus_used: number; client_rating: number | null; client_review: string | null; service: string; icon: string; pet: string; vet: string | null }) => (
               <Link key={o.id} to={`/orders/${o.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-white/[0.04]">
-                <span className="w-10 h-10 rounded-2xl bg-white/[0.06] flex items-center justify-center text-lg flex-shrink-0">{o.icon}</span>
+                <Icon3D emoji={o.icon} size={40} still />
                 <div className="min-w-0 flex-1">
                   <div className="font-bold text-sm truncate">{`${o.service} · ${o.pet}`}</div>
                   <div className="text-[11px] text-white/50 truncate">{`${dateShort(o.scheduled_at)} · ${o.vet ?? '—'}`}</div>
@@ -169,7 +170,7 @@ export function ClientDetailPage() {
           <div className="divide-y divide-white/5">
             {data.shop.map((s: { id: number; title: string; category: string; qty: number; total_rub: number; bonus_used: number; created_at: string }) => (
               <div key={s.id} className="flex items-center gap-3 px-4 py-3">
-                <span className="w-10 h-10 rounded-2xl bg-white/[0.06] flex items-center justify-center text-lg flex-shrink-0">{CATEGORY_ICON[s.category] ?? '📦'}</span>
+                <Icon3D emoji={CATEGORY_ICON[s.category] ?? '📦'} size={40} still />
                 <div className="min-w-0 flex-1"><div className="font-bold text-sm truncate">{s.title}</div><div className="text-[11px] text-white/50">{[dateShort(s.created_at), `${s.qty} шт.`, s.bonus_used ? `бонусами ${rub(s.bonus_used)}` : ''].filter(Boolean).join(' · ')}</div></div>
                 <div className="font-black text-sm money">{rub(s.total_rub + s.bonus_used)}</div>
               </div>

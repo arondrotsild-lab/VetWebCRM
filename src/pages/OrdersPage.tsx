@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Card, PageHead, Loader, ErrorBox, Segmented, Search, Pager, StatusChip, Stars, Avatar, Stat, Row } from '../components/ui';
 import { useCrm, money, rub, num, when, dateLong, time, speciesEmoji } from '../lib/format';
+import Icon3D from '../components/Icon3D';
 
 interface O { id: number; status: string; scheduled_at: string; total_price: number; bonus_used: number; vet_payout: number; client_rating: number | null; address: string;
   service: string; icon: string; client_id: number; client: string; pet: string; species: string; vet: string | null; vet_photo: string | null }
@@ -55,7 +56,7 @@ export default function OrdersPage() {
                 <button key={o.id} onClick={() => nav(`/orders/${o.id}`)} className="w-full text-left px-3 md:px-4 py-3 hover:bg-white/[0.04] grid grid-cols-[1fr_auto] md:grid-cols-[70px_1.3fr_1.2fr_1.2fr_130px_110px] gap-x-3 gap-y-1 items-center">
                   <span className="hidden md:block text-xs text-white/45 font-mono">#{o.id}</span>
                   <span className="flex items-center gap-2.5 min-w-0">
-                    <span className="w-10 h-10 rounded-2xl bg-white/[0.06] flex items-center justify-center text-lg flex-shrink-0">{o.icon}</span>
+                    <Icon3D emoji={o.icon} size={40} still />
                     <span className="min-w-0">
                       <span className="block font-bold text-sm truncate">{o.service}</span>
                       <span className="block text-[11px] text-white/50 truncate">{`${speciesEmoji(o.species)} ${o.pet} · ${when(o.scheduled_at)}`}</span>
